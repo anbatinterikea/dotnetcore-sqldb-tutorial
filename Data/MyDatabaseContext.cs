@@ -15,7 +15,11 @@ namespace DotNetCoreSqlDb.Models
             // feature/aad-msi
             // https://docs.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-connect-msi#modify-aspnet-core
             var connection = (SqlConnection)Database.GetDbConnection();
-            connection.AccessToken = (new Microsoft.Azure.Services.AppAuthentication.AzureServiceTokenProvider()).GetAccessTokenAsync("https://database.windows.net/").Result;
+            if (!(connection.ConnectionString.Contains("User ID=") && connection.ConnectionString.Contains("Password=")))
+            {
+                // use AAD auth
+                connection.AccessToken = (new Microsoft.Azure.Services.AppAuthentication.AzureServiceTokenProvider()).GetAccessTokenAsync("https://database.windows.net/").Result;
+            }
         }
 
         public DbSet<DotNetCoreSqlDb.Models.Todo> Todo { get; set; }
